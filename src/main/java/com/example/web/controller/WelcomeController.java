@@ -23,7 +23,7 @@ public class WelcomeController {
     }
 
     private String getMessage() {
-        return "Hello World After Post Steps";
+        return "Hello World After SCM polling";
     }
 
 }
