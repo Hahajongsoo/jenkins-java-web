@@ -5,7 +5,6 @@ pipeline {
     }
     environment {
         TOMCAT_IP = '10.0.20.24'
-        WORKSPACE = '/var/lib/jenkins/workspace/maven_pipeline'
     }
     stages {
       stage('Checkout') {
@@ -26,7 +25,7 @@ pipeline {
 
       stage('Deploy to Tomcat') {
         steps {
-            sh 'scp $WORKSPACE/target/hello-world.war ubuntu@$TOMCAT_IP:/var/lib/tomcat9/webapps'
+            sh 'scp ${WORKSPACE}/target/hello-world.war ubuntu@$TOMCAT_IP:/var/lib/tomcat9/webapps'
         }
       }
     }
