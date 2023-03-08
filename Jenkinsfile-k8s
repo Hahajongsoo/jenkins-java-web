@@ -77,6 +77,9 @@ spec:
         container('maven') {
             git branch: 'main', url: 'https://github.com/Hahajongsoo/hello-kube.git'
             sh "/bin/bash change-image-tag.sh ${params.IMAGE_REGISTRY_ACCOUNT} ${params.IMAGE_NAME} ${env.BUILD_NUMBER}"
+            withCredentials([gitUsernamePassword(credentialsId: 'github-token', gitToolName: 'Default')]) {
+            sh "git push origin main"
+            }
         }
       }
     }
