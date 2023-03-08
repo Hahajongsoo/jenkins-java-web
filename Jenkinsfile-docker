@@ -1,47 +1,63 @@
 pipeline {
-    agent none
-    parameters {
-        string defaultValue: 'https://github.com/Hahajongsoo/jenkins-java-web', name: 'GIT_REPO'
-        string defaultValue: 'hahajong', name: 'IMAGE_REG_ACCOUNT'
-        string defaultValue: 'hello-world', name: 'IMAGE_NAME'
-    }
-    stages {
-        stage('Checkout') {
-            agent any
-            steps {
-                git branch: 'main', url: "${params.GIT_REPO}"
-            }
-        }
-        stage('Build Maven Project') {
-            agent {
-                docker { image 'maven:3-openjdk-8' }
-            }
-            steps {
-                sh 'mvn clean package -DskipTest=true'
-            }
-        }
-        stage('Test Maven Project') {
-            agent {
-                docker { image 'maven:3-openjdk-8' }
-            }
-            steps {
-                sh 'mvn test'
-            }
-        }
-        stage('Build Docker Image') {
-            agent any
-            steps {
-                sh "docker build -t ${params.IMAGE_REG_ACCOUNT}/${params.IMAGE_NAME}:${BUILD_NUMBER} ."
-            }
-        }
-        stage('Publish Docker Image') {
-            agent any
-            steps {
-                withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1') {
-                  sh "docker image push ${params.IMAGE_REG_ACCOUNT}/${params.IMAGE_NAME}:${BUILD_NUMBER}"
-                }
-            }
-        }
-    }
-}
+  agent none
 
+  triggers {
+    pollSCM '* * * * *'
+  }
+
+  parameters {
+    string name: 'IMAGE_NAME', defaultValue: 'hello-world'
+    string name: 'IMAGE_REGISTRY_ACCOUNT', defaultValue: 'hahajong'
+  }
+
+  stages {
+    stage('SCM Checkout') {
+      agent any
+      steps {
+        git branch: 'main', url: 'https://github.com/Hahajongsoo/jenkins-java-web.git'
+      }
+    }
+
+    stage('Build Maven Project') {
+      agent {
+        docker { image 'maven:3-openjdk-8'}
+      }
+      steps {
+        sh 'mvn clean package -DskipTests=true'
+      }
+    }
+
+    stage('Test Maven Project') {
+      agent {
+        docker { image 'maven:3-openjdk-8'}
+      }
+      steps {
+        sh 'mvn test'
+      }
+    }
+
+    stage('Build Docker Image') {
+      agent any
+      steps {
+        sh "docker image build -t ${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:latest ."
+      }
+    }
+
+    stage('Tagging Docker Image') {
+      agent any
+      steps {
+        sh "docker image tag ${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:latest ${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:${BUILD_NUMBER}"
+      }
+    }
+
+    stage('Publish Docker Image') {
+      agent any
+      steps {
+        withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
+          sh "docker image push --all-tags ${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}"
+          sh "docker image rm ${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:latest ${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:${BUILD_NUMBER}"
+        }
+      }
+    }
+  }
+}
