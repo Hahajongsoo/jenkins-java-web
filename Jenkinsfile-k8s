@@ -28,10 +28,6 @@ spec:
     }
   }
 
-  triggers {
-    pollSCM '* * * * *'
-  }
-
   parameters {
     string name: 'IMAGE_NAME', defaultValue: 'hello-world'
     string name: 'IMAGE_REGISTRY_ACCOUNT', defaultValue: 'hahajong'
