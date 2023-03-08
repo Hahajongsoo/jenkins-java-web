@@ -16,7 +16,7 @@ spec:
     args: ['infinity']
     volumeMounts:
     - name: registry-credentials
-      mountPath: /kaniko/.docker/
+      mountPath: /kaniko/.docker
   volumes:
   - name: registry-credentials
     secret:
@@ -34,14 +34,14 @@ spec:
 
   parameters {
     string name: 'IMAGE_NAME', defaultValue: 'hello-world'
-    string name: 'IMAGE_REGISTRY_ACCOUNT', defaultValue: 'hahajong'
+    string name: 'IMAGE_REGISTRY_ACCOUNT', defaultValue: 'c1t1d0s7'
   }
 
   stages {
     stage('SCM Checkout') {
-      steps { 
+      steps {
         container('maven') {
-            git branch: 'main', url: 'https://github.com/Hahajongsoo/jenkins-java-web.git'
+          git branch: 'main', url: 'https://github.com/c1t1d0s7/hello-webapp.git'
         }
       }
     }
@@ -49,7 +49,7 @@ spec:
     stage('Build Maven Project') {
       steps {
         container('maven') {
-            sh 'mvn clean package -DskipTests=true'
+          sh 'mvn clean package -DskipTests=true'
         }
       }
     }
@@ -57,20 +57,21 @@ spec:
     stage('Test Maven Project') {
       steps {
         container('maven') {
-            sh 'mvn test'
+          sh 'mvn test'
         }
       }
     }
 
-    stage('Build & Push Docker Image') {
+    stage('Build & Tag Docker Image') {
       steps {
         container('kaniko') {
-            sh "executor --dockerfile=Dockerfile \
-                --context=dir://${env.WORKSPACE} \
-                --destination=${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:${BUILD_NUMBER} \
-                --destination=${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:latest"
+          sh "executor --dockerfile=Dockerfile \
+            --context=dir://${env.WORKSPACE} \
+            --destination=${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:${env.BUILD_NUMBER} \
+            --destination=${params.IMAGE_REGISTRY_ACCOUNT}/${params.IMAGE_NAME}:latest"
         }
       }
     }
+
   }
 }
