@@ -16,7 +16,7 @@ spec:
     args: ['infinity']
     volumeMounts:
     - name: registry-credentials
-      mountPath: /kaniko/.docker
+      mountPath: /kaniko/.docker/
   volumes:
   - name: registry-credentials
     secret:
