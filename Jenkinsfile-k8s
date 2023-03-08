@@ -42,7 +42,7 @@ spec:
 
     stage('Test Maven Project') {
       steps {
-        continer('maven') {
+        container('maven') {
             sh 'mvn test'
         }
       }
