@@ -34,14 +34,14 @@ spec:
 
   parameters {
     string name: 'IMAGE_NAME', defaultValue: 'hello-world'
-    string name: 'IMAGE_REGISTRY_ACCOUNT', defaultValue: 'c1t1d0s7'
+    string name: 'IMAGE_REGISTRY_ACCOUNT', defaultValue: 'hahajong'
   }
 
   stages {
     stage('SCM Checkout') {
       steps {
         container('maven') {
-          git branch: 'main', url: 'https://github.com/c1t1d0s7/hello-webapp.git'
+          git branch: 'main', url: 'https://github.com/Hahajongsoo/jenkins-java-web.git'
         }
       }
     }
