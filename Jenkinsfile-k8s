@@ -76,11 +76,7 @@ spec:
       steps {
         container('maven') {
             git branch: 'main', url: 'https://github.com/Hahajongsoo/hello-kube.git'
-            sh'''#!/bin/bash
-                 sed -i "s/image:.*/image: ${params.IMAGE_REGISTRY_ACCOUNT}\\/${params.IMAGE_NAME}:${env.BUILD_NUMBER}/g" deployment.yaml
-                 git add deployment.yaml
-                 git commit -m "Jenkins Build Number - ${env.BUILD_NUMBER}"
-            '''
+            sh "/bin/bash change-image-tag.sh ${params.IMAGE_REGISTRY_ACCOUNT} ${params.IMAGE_NAME} ${env.BUILD_NUMBER}"
         }
       }
     }
