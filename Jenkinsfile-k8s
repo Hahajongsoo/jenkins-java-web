@@ -20,7 +20,7 @@ spec:
   volumes:
   - name: registry-credentials
     secret:
-      secretName: reg-cred
+      secretName: regcred
       items:
       - key: .dockerconfigjson
         path: config.json
